@@ -1,0 +1,88 @@
+name: Update EFI Kexts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 0" # weekly, Sunday 03:00 UTC
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-kexts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq unzip
+
+      - name: Update kexts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+
+          EFI_DIR="EFI"
+          MAP_FILE=".github/kext-repos.json"
+          UPDATED=false
+
+          for KEXT_PATH in $(find "$EFI_DIR" -name "*.kext" -type d); do
+            KEXT_NAME=$(basename "$KEXT_PATH")
+
+            REPO=$(jq -r --arg k "$KEXT_NAME" '.[$k] // empty' "$MAP_FILE")
+            if [ -z "$REPO" ]; then
+              echo "No repo mapping for $KEXT_NAME, skipping"
+              continue
+            fi
+
+            echo "Checking $KEXT_NAME from $REPO"
+
+            API_URL="https://api.github.com/repos/$REPO/releases/latest"
+            DOWNLOAD_URL=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              "$API_URL" | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url' | head -n1)
+
+            if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
+              echo "No release zip found for $KEXT_NAME"
+              continue
+            fi
+
+            TMP_DIR=$(mktemp -d)
+            curl -L "$DOWNLOAD_URL" -o "$TMP_DIR/release.zip"
+            unzip -q "$TMP_DIR/release.zip" -d "$TMP_DIR"
+
+            NEW_KEXT=$(find "$TMP_DIR" -name "$KEXT_NAME" -type d | head -n1)
+            if [ -z "$NEW_KEXT" ]; then
+              echo "Updated $KEXT_NAME not found in archive"
+              continue
+            fi
+
+            rm -rf "$KEXT_PATH"
+            cp -R "$NEW_KEXT" "$KEXT_PATH"
+            UPDATED=true
+          done
+
+          if [ "$UPDATED" = false ]; then
+            echo "No kexts updated"
+            exit 0
+          fi
+
+      - name: Commit changes
+        if: success()
+        run: |
+          git config user.name "Artisan-EFI-Bot"
+          git config user.email "efi@artisanbot.it"
+          git checkout -b kext-updates
+          git add EFI
+          git commit -m "Update EFI kexts to latest releases"
+
+      - name: Create Pull Request
+        if: success()
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "Update EFI kexts"
+          body: "This PR updates EFI kexts to their latest GitHub releases."
+          branch: kext-updates
