@@ -1,6 +1,6 @@
-# ⚡️ ThinkPad X395 OpenCore EFI – Ryzen 5 Pro 3500U
+# ⚡️ ThinkPad X395 OpenCore EFI - Ryzen 5 Pro 3500U
 
-Welcome to my custom EFI for the **Lenovo ThinkPad X395** — finely tuned for maximum compatibility, performance, and stability.  
+Welcome to my custom EFI for the **Lenovo ThinkPad X395** - finely tuned for maximum compatibility, performance, and stability.  
 Tested and running **flawlessly** on my own device. 🧑‍💻🔥
 
 ---
@@ -14,7 +14,7 @@ Tested and running **flawlessly** on my own device. 🧑‍💻🔥
 | RAM                | 16 GB DDR4                       |
 | GPU                | Integrated Radeon Vega           |
 | Display            | 1080p Non-Touchscreen (Tested)   |
-| macOS Version      | all version are working ✅✅✅ |
+| macOS Version      | macOS Catalina to macOS Tahoe    |
 
 > ⚠️ Touchscreen model is **also compatible**, though untested by me. Contributions welcome!
 
@@ -23,7 +23,9 @@ Tested and running **flawlessly** on my own device. 🧑‍💻🔥
 ## ✅ What Works
 
 - [x] Boot to macOS (OpenCore)
-- [x] USB, Audio, Wi-Fi (with supported kexts)
+- [x] USB
+- [x] Audio
+- [x] Wi-Fi
 - [x] Sleep, Brightness, Battery Stats
 - [x] HDMI Output
 - [x] Trackpad & Keyboard
