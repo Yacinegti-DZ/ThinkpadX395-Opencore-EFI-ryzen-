@@ -1,4 +1,4 @@
-# ⚡️ ThinkPad X395 OpenCore EFI - Ryzen 5 Pro 3500U
+# ⚡️ ThinkPad X395 OpenCore EFI - Ryzen 5 Pro 3500U（请问大佬这个支持X395 Ryzen 7 Pro 3700U吗？）
 
 Welcome to my custom EFI for the **Lenovo ThinkPad X395** - finely tuned for maximum compatibility, performance, and stability.  
 Tested and running **flawlessly** on my own device. 🧑‍💻🔥
